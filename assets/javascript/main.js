@@ -15,7 +15,7 @@ var name = "";
 var destination = "";
 var firstTime = "";
 var frequency = "";
-var ETA = "";
+
 
 var dbname = "";
 var dbdestination = "";
@@ -23,11 +23,13 @@ var dbfirstTime = "";
 var dbfrequency = "";
 var dbid = "";
 
-// var minutes;
-// var hour;
-// var period;
 
-var x = moment(moment().format('LTS'))._i;  
+
+var now = new Date() //moment().format();  
+
+
+
+
 
 
 $('#submit').on('click', function(event){
@@ -39,17 +41,14 @@ $('#submit').on('click', function(event){
     frequency = $("#frequency-input").val().trim();
     id = destination + firstTime + frequency
     
+ 
+    let hour = firstTime.slice(0,2)
+    let minutes = firstTime.slice(2,4)
     
-    // hour = firstTime.slice(0,2)
-    // minutes = firstTime.slice(3,5)
-    // period = firstTime.slice(6,8)
-
-
-
-
-    console.log(time)
-
    
+    var firstTimeDate = new Date(now.getFullYear(), now.getMonth() , now.getDate(), hour, minutes)
+
+
     var train = {
         'id':id,
         'train': name,
@@ -59,7 +58,8 @@ $('#submit').on('click', function(event){
     }
 
     db.ref('/trains/' + id).set(train)
-    console.log(train)
+
+    // console.log(train)
 })
                     
 db.ref('/trains').on('child_added', function(snap){
@@ -69,15 +69,15 @@ db.ref('/trains').on('child_added', function(snap){
     dbfirstTime = snap.val().firstTime;
     dbfrequency = snap.val().frequency;
     dbid = snap.val().id;
-    ETA = Math.floor((dbfrequency * 0.9))
-
-    let minutes = dbfirstTime
-
+    let TTA = Math.floor((dbfrequency * 0.1))
+    let ETA = moment().add(TTA,'m')._d
+    formatETA = moment(ETA).format("HH:mm")
+    console.log(formatETA)
 
     let $row = $('<tr>');
     $row.html('<td>' + dbname + '</td><td>' + dbdestination + '</td>' +
-              '<td>' + dbfrequency + '</td><td>' + dbfirstTime + '</td>' +
-              '<td>' + ETA + '</td>');
+              '<td>' + dbfrequency + '</td><td>' + formatETA + '</td>' +
+              '<td>' + TTA + '</td>');
 
     $('table').append($row)
 
